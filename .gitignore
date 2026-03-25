@@ -1,0 +1,38 @@
+# Planning & internal
+.planning/
+AGENTS.md
+IMPLEMENTATION_PLAN.md
+
+# Database (generated at runtime)
+data/*.db
+
+# User materials (private PDFs and test files)
+materials/*.pdf
+materials/*.PDF
+materials/test.txt
+
+# Logs & debug
+*.log
+debug_*.py
+debug_*.txt
+test_output.txt
+test2.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Editor / tool config (user-specific)
+.claude/
+.opencode/
+
+# Env
+.env
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
