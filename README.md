@@ -26,8 +26,8 @@ No external APIs needed. The AI that's already running in your client **is** the
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/insegnante-interattivo-mcp
-cd insegnante-interattivo-mcp
+git clone https://github.com/YOUR_USERNAME/MCP_AdaptiveTutor
+cd MCP_AdaptiveTutor
 pip install -r requirements.txt
 ```
 
@@ -57,7 +57,7 @@ On **Windows**, use the included `run.bat` instead:
   "mcp": {
     "insegnante": {
       "type": "local",
-      "command": ["C:/path/to/insegnante-interattivo-mcp/run.bat"],
+      "command": ["C:/path/to/MCP_AdaptiveTutor/run.bat"],
       "enabled": true
     }
   }
@@ -141,7 +141,7 @@ The loop is: **quiz → errors saved → adaptive quiz → errors updated → re
 ## Project structure
 
 ```
-insegnante-interattivo-mcp/
+MCP_AdaptiveTutor/
 ├── src/
 │   ├── server.py        # MCP tools and prompts
 │   ├── quiz.py          # Session logic, weak concept analysis
