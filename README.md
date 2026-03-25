@@ -64,7 +64,7 @@ On **Windows**, use the included `run.bat` instead:
 }
 ```
 
-Restart OpenCode — the tools will be available immediately. You will see a list of command with the prefixes '/insegnante:'
+Restart OpenCode — the tools will be available immediately. You will see a list of command with the prefixes 'insegnante_interattivo such as '/insegnante_interattivo:list_materials_prompt '
 
 ---
 
