@@ -26,7 +26,7 @@ No external APIs needed. The AI that's already running in your client **is** the
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/MCP_AdaptiveTutor
+git clone https://github.com/NicCaterino/MCP_AdaptiveTutor
 cd MCP_AdaptiveTutor
 pip install -r requirements.txt
 ```
