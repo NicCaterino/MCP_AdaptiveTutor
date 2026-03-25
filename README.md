@@ -20,6 +20,7 @@ No external APIs needed. The AI that's already running in your client **is** the
 
 - Python 3.11+
 - OpenCode (or any MCP client with stdio transport support)
+- Node.js
 
 ---
 
