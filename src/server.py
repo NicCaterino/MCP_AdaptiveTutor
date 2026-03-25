@@ -36,8 +36,32 @@ def list_materials() -> List[dict]:
 
 
 @mcp.tool()
+def remove_material(material_id: int) -> dict:
+    """Remove a material and all its content from the library.
+
+    Args:
+        material_id: ID of the material to remove
+    """
+    db = next(get_db())
+    try:
+        material = db.query(Material).filter(Material.id == material_id).first()
+        if not material:
+            return {"error": f"Material {material_id} not found"}
+        filename = material.filename
+        db.query(ContentChunk).filter(ContentChunk.material_id == material_id).delete()
+        db.delete(material)
+        db.commit()
+        return {"removed": filename, "material_id": material_id}
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}
+    finally:
+        db.close()
+
+
+@mcp.tool()
 def scan_and_add_materials(folder_path: str = "materials") -> dict:
-    """Scan a folder for PDF files and add them to the library.
+    """Scan a folder for PDF files, add new ones, and remove records for deleted files.
 
     Args:
         folder_path: Path to the folder containing PDF files (default: "materials")
@@ -47,18 +71,29 @@ def scan_and_add_materials(folder_path: str = "materials") -> dict:
 
     db = next(get_db())
     try:
-        existing_files = {m.filepath for m in db.query(Material.filepath).all()}
-        pdf_files = [
+        pdf_files = {
             os.path.join(folder_path, f)
             for f in os.listdir(folder_path)
             if f.lower().endswith(".pdf")
-        ]
+        }
+
+        existing_materials = db.query(Material).all()
+        existing_by_path = {m.filepath: m for m in existing_materials}
+
+        # Remove records for files no longer on disk
+        removed = []
+        for filepath, material in existing_by_path.items():
+            if filepath not in pdf_files:
+                db.query(ContentChunk).filter(ContentChunk.material_id == material.id).delete()
+                db.delete(material)
+                removed.append(material.filename)
+        db.commit()
 
         added = []
         skipped = 0
 
         for filepath in pdf_files:
-            if filepath in existing_files:
+            if filepath in existing_by_path:
                 skipped += 1
                 continue
             try:
@@ -85,7 +120,7 @@ def scan_and_add_materials(folder_path: str = "materials") -> dict:
             db.commit()
             added.append({"id": material.id, "filename": filename, "num_pages": len(pages), "chunks_created": chunks_created})
 
-        return {"added_count": len(added), "skipped_count": skipped, "added_materials": added}
+        return {"added_count": len(added), "removed_count": len(removed), "skipped_count": skipped, "added_materials": added, "removed_materials": removed}
     except Exception as e:
         db.rollback()
         return {"error": f"Failed to scan folder: {str(e)}"}
@@ -397,10 +432,11 @@ def get_session_summary(session_id: int) -> dict:
 
 @mcp.prompt()
 def list_materials_prompt() -> str:
-    """Prompt to list all materials in the library."""
-    return """Call `list_materials` and show the results to the student.
-For each material show: name, number of pages, date added.
-If the library is empty, suggest adding a PDF with the add-material prompt."""
+    """Prompt to list all materials, auto-syncing with the materials folder first."""
+    return """First call `scan_and_add_materials` to sync the library with the materials folder (picks up new PDFs and removes deleted ones).
+Then call `list_materials` and show the current library to the student.
+For each material show: ID, name, number of pages.
+If the library is empty, tell the student to drop PDF files into the materials/ folder and run this again."""
 
 
 @mcp.prompt()
